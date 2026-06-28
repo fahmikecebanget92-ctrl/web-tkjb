@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zyfienk.site.je | Secure Class Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-color: #3d243a;
+            --text-muted: #7a5c75;
+            --accent-pink: #fa709a;
+            --accent-purple: #6c5ce7;
+            --accent-green: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            padding: 30px 4%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(61, 36, 58, 0.3);
+            z-index: 1;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1200px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            padding: 35px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-container {
+            max-width: 450px;
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        /* --- DASHBOARD HEADER --- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px dashed rgba(61, 36, 58, 0.15);
+            padding-bottom: 20px;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.2rem;
+            color: var(--text-color);
+        }
+
+        /* --- SCREEN CONTROLLER --- */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* --- TABS NAVIGATION --- */
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-color);
+            transition: 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--text-color);
+            color: #fff;
+        }
+
+        .sub-tab-content { display: none; }
+        .sub-tab-content.active { display: block; }
+
+        /* --- UTILITIES & INPUTS --- */
+        .search-box, .input-field {
+            padding: 14px 20px;
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            font-size: 0.95rem;
+            outline: none;
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-color);
+            font-weight: 700;
+            width: 100%;
+        }
+
+        .btn-action {
+            padding: 14px 24px;
+            background: var(--accent-purple);
+            color: #fff;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-navigation {
+            padding: 14px 28px;
+            background: var(--text-color);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-action:hover, .btn-navigation:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* --- TABLE LAYOUT --- */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        th {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--text-color);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom: 2px solid var(--glass-border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:hover td { background: rgba(255, 255, 255, 0.45); }
+        .center-col { text-align: center; }
+        .num-col { text-align: center; font-weight: 700; width: 60px; }
+        .name-col { font-weight: 700; min-width: 260px; }
+
+        /* --- CHECKBOX SYSTEM --- */
+        .check-item { width: 18px; height: 18px; cursor: pointer; transition: 0.2s; }
+        .check-item:hover { transform: scale(1.2); }
+        .check-absen { accent-color: var(--accent-purple); }
+        .check-kas { accent-color: var(--accent-green); }
+
+        .reg-form-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .reg-form-box .input-field { flex: 1; }
+
+        .delete-btn {
+            background: #ff4757; color: white; border: none;
+            padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700;
+        }
+
+        .admin-link {
+            display: inline-block; margin-top: 20px; color: var(--text-muted);
+            font-size: 0.85rem; text-decoration: none; font-weight: 700; cursor: pointer;
+        }
+
+        .table-responsive::-webkit-scrollbar { height: 10px; }
+        .table-responsive::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .table-responsive::-webkit-scrollbar-thumb { background: rgba(250, 112, 154, 0.4); border-radius: 10px; }
+
+        footer {
+            position: relative; z-index: 2; text-align: center;
+            padding: 20px 0 10px 0; color: #fff; font-weight: 600;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3); width: 100%;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- ================= HALAMAN 1: GERBANG MASUK (LOGIN) ================= -->
+    <div id="screen-login" class="main-container login-container view-section active">
+        <h1 style="font-family: 'Fredoka', sans-serif; color: var(--text-color); margin-bottom: 10px;">zyfienk.site.je 🌅</h1>
+        <p style="color: var(--text-muted); font-weight: 700; margin-bottom: 25px; font-size: 0.95rem;">Selamat datang! Silakan masukkan nama absen Anda untuk masuk ke sistem kelas.</p>
+        
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="loginNameInput" class="input-field" placeholder="Ketik Nama Lengkap Anda..." style="text-align: center;">
+        </div>
+        
+        <button class="btn-navigation" onclick="verifyAndLogin()" style="width: 100%;">Masuk Kelas ➔</button>
+        
+        <div class="admin-link" onclick="accessAdminMode()">Akses Panel Registrasi (Khusus Admin)</div>
+    </div>
+
+    <!-- ================= HALAMAN 2: DASHBOARD UTAMA (ABSEN & KAS) ================= -->
+    <div id="screen-dashboard" class="main-container view-section">
+        <div class="dashboard-header">
+            <div>
+                <h1>zyfienk.site.je 📑</h1>
+                <p style="font-size:0.9rem; color:var(--text-muted); font-weight:700; margin-top:3px;">Halo, <span id="userBadge" style="color:var(--accent-purple);">Siswa</span> 👋</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div class="tabs-nav">
+                    <button id="btn-tab-absen" class="tab-btn active" onclick="switchDashboardTab('absen')">📅 Absensi (P1-P16)</button>
+                    <button id="btn-tab-kas" class="tab-btn" onclick="switchDashboardTab('kas')">💰 Uang Kas (12 Bulan)</button>
+                </div>
+                <input type="text" id="searchBar" class="search-box" placeholder="Cari nama..." onkeyup="filterSiswa()" style="width: 200px; padding: 10px 15px;">
+            </div>
+        </div>
+
+        <!-- SUB TAB: ABSENSI -->
+        <div id="sub-absen" class="sub-tab-content active">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr id="absenHeaderRow">
+                            <th style="text-align: center;">No</th>
+                            <th>Nama Siswa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="absenTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SUB TAB: UANG KAS (12 BULAN) -->
+        <div id="sub-kas" class="sub-tab-content">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr id="kasHeaderRow">
+                            <th style="text-align: center;">No</th>
+                            <th>Nama Siswa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kasTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <button class="btn-navigation" style="background: rgba(255,255,255,0.4); color: var(--text-color); border:2px solid var(--glass-border);" onclick="logout()">Logout ⬅</button>
+            <span style="font-weight: 700; color: var(--text-muted);" id="totalSiswaBadge">Total: 0 Siswa</span>
+        </div>
+    </div>
+
+    <!-- ================= HALAMAN 3: PANEL REGISTRASI (KHUSUS ADMIN) ================= -->
+    <div id="screen-registrasi" class="main-container view-section">
+        <div class="dashboard-header">
+            <div>
+                <h1>Panel Registrasi Kelas ⚙️</h1>
+                <p style="font-size:0.9rem; color:var(--text-muted); font-weight:700; margin-top:3px;">Khusus Manajemen Database Siswa</p>
+            </div>
+            <button class="btn-navigation" style="background: var(--text-color);" onclick="logout()">Keluar Kelola ➔</button>
+        </div>
+
+        <div class="reg-form-box">
+            <input type="text" id="studentNameInput" class="input-field" placeholder="Ketik nama siswa baru yang ingin didaftarkan...">
+            <button class="btn-action" onclick="addStudent()">➕ Daftarkan Murid</button>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 70px; text-align: center;">No</th>
+                        <th>Nama Siswa Terdaftar Di Whitelist</th>
+                        <th style="width: 100px; text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="regTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>zyfienk.site.je &copy; 2026 | Private Gatekeeper System</p>
+    </footer>
+
+    <!-- INTERACTIVE SECURITY LOGIC -->
+    <script>
+        // Database 37 Siswa Utama Berdasarkan Foto
+        const defaultStudents = [
+            "ADELIA SALSABILAH", "ADITYA AL FARIDZI", "AHMAD SAUQI AZZAM", "AINNA UMAYIRO", 
+            "AISYAH NUR DIANA", "ALISYAH SAHRA HASIBUAN", "ANANDA ZYVANO IMMANUEL", "ANGGRA RESTU AJI", 
+            "ASSYIFA OKTA APRILIA", "ATHIFA NINDYA CETTA", "AZZAHRA PUTRI ADEESYA", "CHELSEA OLIVIA LUMBAN SIANTAR", 
+            "CIRA ALLEGRA PUTRI CORNELLIA", "DANTI NUR ISNAINI RAMADHANI", "DEVITA ANJANI", "DINDA ZAQYA", 
+            "FITRIANI", "INTAN PUTRI PERMATA SARI", "JIHAN FADILAH", "KHAERANI NADA", 
+            "MIA NURUL ZAHRO", "MUAZAM RAFI RIDWANSYAH", "MUHAMMAD ALHAFIDZ", "MUHAMMAD FAHMI IDRIS", 
+            "MUHAMMAD FIDAL UBAIDILAH", "MUHAMMAD KAISA TAMAMIL FADLI", "MUHAMMAD VRADINO", "NASYWAN FAIQ RAMADHAN", 
+            "NUR SARIFAH RAMANDANI", "RAIHAN MAULANA YUSUF", "RANIA FEBRYANTI", "RASYA NURUL HAFIZA", 
+            "ROHMANUR SEPTIANI AZHAR", "SALSABILA GHINA RAHMANI", "SITA APRILIA PUTRI", "VANESSA KYLA SHARLIZ", 
+            "YAYAH KHOIRIA"
+        ];
+
+        let students = JSON.parse(localStorage.getItem('zf_students')) || defaultStudents;
+        let attendanceData = JSON.parse(localStorage.getItem('zf_attendance')) || {};
+        let kasData = JSON.parse(localStorage.getItem('zf_kas')) || {};
+
+        window.onload = function() {
+            generateHeaders();
+            renderRegistrasi();
+            document.getElementById('totalSiswaBadge').innerText = `Total: ${students.length} Siswa`;
+        };
+
+        function saveData() {
+            localStorage.setItem('zf_students', JSON.stringify(students));
+            localStorage.setItem('zf_attendance', JSON.stringify(attendanceData));
+            localStorage.setItem('zf_kas', JSON.stringify(kasData));
+            document.getElementById('totalSiswaBadge').innerText = `Total: ${students.length} Siswa`;
+        }
+
+        // --- SISTEM VERIFIKASI GERBANG MASUK ---
+        function verifyAndLogin() {
+            const inputName = document.getElementById('loginNameInput').value.trim().toUpperCase();
+            
+            if(inputName === "") {
+                alert("Masukkan nama kamu dulu ya!");
+                return;
+            }
+
+            // Cek apakah nama yang diinput ada di database registrasi
+            if(students.includes(inputName)) {
+                document.getElementById('userBadge').innerText = inputName;
+                changeScreen('screen-dashboard');
+                renderAbsensi();
+                renderKas();
+            } else {
+                alert("⚠️ AKSES DITOLAK! Nama Anda tidak terdaftar di kelas ini. Silakan hubungi Admin.");
+            }
+        }
+
+        // Akses menu registrasi menggunakan password rahasia admin
+        function accessAdminMode() {
+            const password = prompt("Masukkan Password Keamanan Admin:");
+            if(password === "zyfienk123") {
+                changeScreen('screen-registrasi');
+                renderRegistrasi();
+            } else if(password !== null) {
+                alert("❌ Password Salah! Anda tidak punya hak akses.");
+            }
+        }
+
+        function changeScreen(screenId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if(screenId === 'screen-login') {
+                document.getElementById('loginNameInput').value = '';
+            }
+        }
+
+        function logout() {
+            changeScreen('screen-login');
+        }
+
+        function switchDashboardTab(type) {
+            document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            if(type === 'absen') {
+                document.getElementById('sub-absen').classList.add('active');
+                document.getElementById('btn-tab-absen').classList.add('active');
+            } else {
+                document.getElementById('sub-kas').classList.add('active');
+                document.getElementById('btn-tab-kas').classList.add('active');
+            }
+        }
+
+        function generateHeaders() {
+            const absenRow = document.getElementById('absenHeaderRow');
+            for(let i=1; i<=16; i++) {
+                let th = document.createElement('th');
+                th.className = 'center-col'; th.style.minWidth = '55px'; th.innerText = `P${i}`;
+                absenRow.appendChild(th);
+            }
+
+            const kasRow = document.getElementById('kasHeaderRow');
+            for(let i=1; i<=12; i++) {
+                let th = document.createElement('th');
+                th.className = 'center-col'; th.style.minWidth = '95px'; th.innerText = `Bulan ${i}`;
+                kasRow.appendChild(th);
+            }
+        }
+
+        function renderRegistrasi() {
+            const tbody = document.getElementById('regTableBody');
+            tbody.innerHTML = '';
+            students.forEach((name, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="num-col">${index + 1}</td>
+                        <td style="font-weight:700;">${name}</td>
+                        <td class="center-col"><button class="delete-btn" onclick="deleteStudent(${index}, '${name}')">🗑 Hapus</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderAbsensi() {
+            const tbody = document.getElementById('absenTableBody');
+            tbody.innerHTML = '';
+            students.forEach((name, index) => {
+                if (!attendanceData[name]) attendanceData[name] = Array(16).fill(false);
+                let checkBoxes = '';
+                for(let i=0; i<16; i++) {
+                    let checked = attendanceData[name][i] ? 'checked' : '';
+                    checkBoxes += `<td class="center-col"><input type="checkbox" class="check-item check-absen" ${checked} onchange="toggleAbsen('${name}', ${i})"></td>`;
+                }
+                tbody.innerHTML += `<tr><td class="num-col">${index + 1}</td><td class="name-col">${name}</td>${checkBoxes}</tr>`;
+            });
+        }
+
+        function renderKas() {
+            const tbody = document.getElementById('kasTableBody');
+            tbody.innerHTML = '';
+            students.forEach((name, index) => {
+                if (!kasData[name]) kasData[name] = Array(12).fill(false);
+                let checkBoxes = '';
+                for(let i=0; i<12; i++) {
+                    let checked = kasData[name][i] ? 'checked' : '';
+                    checkBoxes += `<td class="center-col"><input type="checkbox" class="check-item check-kas" ${checked} onchange="toggleKas('${name}', ${i})"></td>`;
+                }
+                tbody.innerHTML += `<tr><td class="num-col">${index + 1}</td><td class="name-col">${name}</td>${checkBoxes}</tr>`;
+            });
+        }
+
+        function addStudent() {
+            const input = document.getElementById('studentNameInput');
+            const name = input.value.trim().toUpperCase();
+            if(name === '') return;
+
+            if(students.includes(name)) {
+                alert('Nama ini sudah terdaftar!');
+                return;
+            }
+
+            students.push(name);
+            attendanceData[name] = Array(16).fill(false);
+            kasData[name] = Array(12).fill(false);
+            saveData();
+            renderRegistrasi();
+            input.value = '';
+        }
+
+        function deleteStudent(index, name) {
+            if(confirm(`Hapus ${name} dari sistem?`)) {
+                students.splice(index, 1);
+                delete attendanceData[name];
+                delete kasData[name];
+                saveData();
+                renderRegistrasi();
+            }
+        }
+
+        function toggleAbsen(name, index) { attendanceData[name][index] = !attendanceData[name][index]; saveData(); }
+        function toggleKas(name, index) { kasData[name][index] = !kasData[name][index]; saveData(); }
+
+        function filterSiswa() {
+            const input = document.getElementById("searchBar").value.toUpperCase();
+            const activeTab = document.getElementById("sub-absen").classList.contains("active") ? "absenTableBody" : "kasTableBody";
+            const tr = document.getElementById(activeTab).getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                const td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    const txtValue = td.textContent || td.innerText;
+                    tr[i].style.display = txtValue.toUpperCase().indexOf(input) > -1 ? "" : "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
